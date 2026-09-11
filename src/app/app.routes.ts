@@ -18,6 +18,23 @@ export const routes: Routes = [
       import('./features/article-details/article-details').then((m) => m.ArticleDetails),
   },
   {
+    path: 'write',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/create-article/create-article').then((m) => m.CreateArticle),
+  },
+  {
+    path: 'write/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/create-article/create-article').then((m) => m.CreateArticle),
+  },
+  {
+    path: 'my-posts',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/my-posts/my-posts').then((m) => m.MyPosts),
+  },
+  {
     path: 'home',
     canActivate: [authGuard],
     loadComponent: () => import('./features/home/home').then((m) => m.Home),

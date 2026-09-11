@@ -75,7 +75,7 @@ export class ArticleDetails {
       this.authorArticles.set(authorArticles.filter((item) => item.id !== article.id));
 
       // Related articles
-      const allArticles = await this.articleService.getArticles();
+      const allArticles = await this.articleService.getPublishedArticles();
 
       this.relatedArticles.set(
         allArticles

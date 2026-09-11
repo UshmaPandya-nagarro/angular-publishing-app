@@ -98,8 +98,7 @@
 
             <span>
               {{
-              article.publishedAt
-              .toLocaleDateString()
+              article.publishedAt?.toLocaleDateString()
               }}
             </span>
 
@@ -129,12 +128,7 @@
 
     <!-- ARTICLE CONTENT -->
 
-    <article class="article-content">
-
-      <p>
-        {{ article.content }}
-      </p>
-
+    <article class="article-content" [innerHTML]="article.content">
     </article>
 
 

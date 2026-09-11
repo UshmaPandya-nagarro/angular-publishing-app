@@ -22,11 +22,12 @@
             (input)="onSearch(searchInput.value)" />
         </div>
 
-        <button type="button" class="write-button">
-          <span>✎</span>
+        <button type="button" class="write-button" (click)="writeArticle()">
           Write article
         </button>
-
+        <button class="write-button" type="button" routerLink="/my-posts">
+          My Posts
+        </button>
       </div>
 
     </div>

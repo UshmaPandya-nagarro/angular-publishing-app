@@ -1,0 +1,87 @@
+<div class="editor-page">
+
+  <header class="editor-header">
+
+    <div>
+      <span class="editor-label">
+        New story
+      </span>
+
+      <span class="save-status">
+        {{ message() }}
+      </span>
+    </div>
+
+    <div class="header-actions">
+
+      <button type="button" class="secondary-button" (click)="saveDraft()" [disabled]="saving()">
+        @if (saving()) {
+        Saving...
+        } @else {
+        Save draft
+        }
+      </button>
+
+      <button type="button" class="publish-button" (click)="publishArticle()" [disabled]="publishing()">
+        @if (publishing()) {
+        Publishing...
+        } @else {
+        Publish
+        }
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <main class="editor-container" [formGroup]="articleForm">
+
+    <input type="text" class="title-input" placeholder="Article title..." formControlName="title" />
+
+
+    <textarea class="description-input" placeholder="Write a short description..." rows="2"
+      formControlName="description"></textarea>
+
+
+    <div class="thumbnail-section">
+
+      <label>
+        Cover image
+      </label>
+
+      <input type="url" placeholder="Paste cover image URL..." formControlName="thumbnail" />
+
+    </div>
+
+
+    <div class="editor-wrapper">
+
+      <quill-editor formControlName="content" [modules]="editorModules" placeholder="Tell your story...">
+      </quill-editor>
+
+    </div>
+
+
+    <section class="schedule-section">
+
+      <div>
+
+        <h3>
+          Schedule publication
+        </h3>
+
+        <p>
+          Leave empty to publish immediately,
+          or choose a future date and time.
+        </p>
+
+      </div>
+
+      <input type="datetime-local" formControlName="scheduledAt" />
+
+    </section>
+
+  </main>
+
+</div>

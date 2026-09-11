@@ -1,0 +1,248 @@
+<div class="my-posts-page">
+
+  <div class="page-header">
+
+    <div>
+      <p class="eyebrow">
+        YOUR CONTENT
+      </p>
+
+      <h1>My Posts</h1>
+
+      <p class="subtitle">
+        Manage your drafts,
+        published articles and
+        scheduled stories.
+      </p>
+    </div>
+
+  </div>
+
+
+  <div class="tabs">
+
+    <button type="button" [class.active]="
+        activeTab() === 'draft'
+      " (click)="setTab('draft')">
+
+      Drafts
+
+      <span class="count">
+        {{
+        articles()
+        .filter(
+        article =>
+        article.status ===
+        'draft'
+        ).length
+        }}
+      </span>
+
+    </button>
+
+
+    <button type="button" [class.active]="
+        activeTab() === 'published'
+      " (click)="setTab('published')">
+
+      Published
+
+      <span class="count">
+        {{
+        articles()
+        .filter(
+        article =>
+        article.status ===
+        'published'
+        ).length
+        }}
+      </span>
+
+    </button>
+
+
+    <button type="button" [class.active]="
+        activeTab() === 'scheduled'
+      " (click)="setTab('scheduled')">
+
+      Scheduled
+
+      <span class="count">
+        {{
+        articles()
+        .filter(
+        article =>
+        article.status ===
+        'scheduled'
+        ).length
+        }}
+      </span>
+
+    </button>
+
+  </div>
+
+
+  @if (loading()) {
+
+  <div class="state-card">
+    Loading your posts...
+  </div>
+
+  } @else if (
+  filteredArticles().length === 0
+  ) {
+
+  <div class="state-card">
+
+    <h2>No posts here yet</h2>
+
+    <p>
+      You don't have any
+      {{ activeTab() }}
+      articles.
+    </p>
+
+  </div>
+
+  } @else {
+
+  <div class="posts-list">
+
+    @for (
+    article of filteredArticles();
+    track article.id
+    ) {
+
+    <article class="post-card">
+
+      <div class="post-main">
+
+        <div class="post-status">
+          {{ article.status }}
+        </div>
+
+        <h2>
+          {{ article.title }}
+        </h2>
+
+        <p class="description">
+          {{ article.description }}
+        </p>
+
+
+        <div class="meta">
+
+          @if (article.updatedAt) {
+
+          <span>
+            Updated
+            {{
+            article.updatedAt
+            | date:'medium'
+            }}
+          </span>
+
+          }
+
+
+          @if (
+          article.status ===
+          'scheduled' &&
+          article.scheduledAt
+          ) {
+
+          <span>
+            Scheduled for
+            {{
+            article.scheduledAt
+            | date:'medium'
+            }}
+          </span>
+
+          }
+
+
+          @if (
+          article.status ===
+          'published' &&
+          article.publishedAt
+          ) {
+
+          <span>
+            Published
+            {{
+            article.publishedAt
+            | date:'medium'
+            }}
+          </span>
+
+          }
+
+        </div>
+
+
+        <div class="actions">
+
+          @if (
+          article.status ===
+          'draft' ||
+          article.status ===
+          'scheduled'
+          ) {
+
+          <button type="button" class="primary-button" (click)="
+                    editArticle(article)
+                  ">
+
+            Edit
+
+          </button>
+
+          }
+
+
+          @if (
+          article.status ===
+          'published'
+          ) {
+
+          <button type="button" class="primary-button" (click)="
+                    viewArticle(article)
+                  ">
+
+            View
+
+          </button>
+
+
+          <button type="button" class="secondary-button" (click)="
+                    editArticle(article)
+                  ">
+
+            Edit
+
+          </button>
+
+          }
+
+        </div>
+
+      </div>
+
+
+      @if (article.thumbnail) {
+
+      <img class="thumbnail" [src]="article.thumbnail" [alt]="article.title" />
+
+      }
+
+    </article>
+
+    }
+
+  </div>
+
+  }
+
+</div>

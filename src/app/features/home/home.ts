@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { ArticleService } from '../../core/services/article';
 import { Article } from '../../core/models/article.model';
@@ -8,7 +8,7 @@ type SortOption = 'latest' | 'popular' | 'editorsPick';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -92,10 +92,13 @@ export class Home {
     this.router.navigate(['/articles', articleId]);
   }
 
+  writeArticle(): void {
+    this.router.navigate(['/write']);
+  }
+
   private async loadArticles(): Promise<void> {
     try {
-      const articles = await this.articleService.getArticles();
-
+      const articles = await this.articleService.getPublishedArticles();
       this.articles.set(articles);
     } catch (error) {
       console.error(error);

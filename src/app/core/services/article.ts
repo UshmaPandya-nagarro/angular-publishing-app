@@ -8,6 +8,7 @@ import {
   getDoc,
   getDocs,
   where,
+  updateDoc,
 } from 'firebase/firestore';
 
 import { firestore } from '../firebase/firebase.config';
@@ -17,55 +18,104 @@ import { Article } from '../models/article.model';
   providedIn: 'root',
 })
 export class ArticleService {
-  async getArticles(): Promise<Article[]> {
+  async getPublishedArticles(): Promise<Article[]> {
     const articlesRef = collection(firestore, 'articles');
 
-    const articlesQuery = query(articlesRef);
+    const snapshot = await getDocs(articlesRef);
 
-    const snapshot = await getDocs(articlesQuery);
+    const now = new Date();
 
-    console.log(
-      'Fetched articles:',
-      snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })),
-    );
+    let publishedArticles = snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
 
-    const articles = snapshot.docs.map((doc) => {
-      const data = doc.data();
+        return {
+          id: doc.id,
 
-      return {
-        id: doc.id,
-        title: data['title'],
-        description: data['description'],
-        content: data['content'],
-        thumbnail: data['thumbnail'],
-        authorId: data['authorId'],
-        authorName: data['authorName'],
-        publishedAt: data['publishedAt']?.toDate(),
-        views: data['views'] ?? 0,
-        featured: data['featured'] ?? false,
-        editorsPick: data['editorsPick'] ?? false,
-      } as Article;
-    });
+          title: data['title'],
 
-    return articles;
-    //   .sort((a, b) => {
-    //   console.log('Comparing articles:', a, b);
-    //   return b.publishedAt.getTime() - a.publishedAt.getTime();
-    // });
+          description: data['description'],
+
+          content: data['content'],
+
+          thumbnail: data['thumbnail'],
+
+          authorId: data['authorId'],
+
+          authorName: data['authorName'],
+
+          createdAt: data['createdAt']?.toDate?.(),
+
+          updatedAt: data['updatedAt']?.toDate?.(),
+
+          publishedAt: data['publishedAt'] ? data['publishedAt'].toDate() : null,
+
+          scheduledAt: data['scheduledAt'] ? data['scheduledAt'].toDate() : null,
+
+          status: data['status'] ?? 'published',
+
+          views: data['views'] ?? 0,
+
+          featured: data['featured'] ?? false,
+
+          editorsPick: data['editorsPick'] ?? false,
+        } as Article;
+      })
+      .filter((article) => {
+        // Normal published article
+        if (article.status === 'published') {
+          return true;
+        }
+
+        // Scheduled article whose date has arrived
+        if (article.status === 'scheduled' && article.scheduledAt && article.scheduledAt <= now) {
+          return true;
+        }
+
+        // Draft or future scheduled article
+        return false;
+      })
+      .sort((a, b) => {
+        const dateA = a.publishedAt?.getTime() ?? a.scheduledAt?.getTime() ?? 0;
+
+        const dateB = b.publishedAt?.getTime() ?? b.scheduledAt?.getTime() ?? 0;
+
+        return dateB - dateA;
+      });
+    console.log('Published Articles:', publishedArticles);
+    return publishedArticles;
   }
 
-  async createArticle(article: Omit<Article, 'id' | 'publishedAt'>): Promise<string> {
+  async createArticle(article: {
+    title: string;
+    description: string;
+    content: string;
+    thumbnail: string;
+
+    authorId: string;
+    authorName: string;
+
+    status: 'draft' | 'published' | 'scheduled';
+
+    scheduledAt?: Date | null;
+
+    views: number;
+    featured: boolean;
+    editorsPick: boolean;
+  }): Promise<string> {
     const articlesRef = collection(firestore, 'articles');
 
-    const docRef = await addDoc(articlesRef, {
+    const document = await addDoc(articlesRef, {
       ...article,
-      publishedAt: serverTimestamp(),
+
+      createdAt: serverTimestamp(),
+
+      updatedAt: serverTimestamp(),
+
+      publishedAt: article.status === 'published' ? serverTimestamp() : null,
     });
 
-    return docRef.id;
+    return document.id;
   }
 
   async getArticleById(articleId: string): Promise<Article | null> {
@@ -81,15 +131,29 @@ export class ArticleService {
 
     return {
       id: snapshot.id,
+
       title: data['title'],
       description: data['description'],
       content: data['content'],
       thumbnail: data['thumbnail'],
+
       authorId: data['authorId'],
       authorName: data['authorName'],
-      publishedAt: data['publishedAt']?.toDate(),
+
+      createdAt: data['createdAt']?.toDate?.(),
+
+      updatedAt: data['updatedAt']?.toDate?.(),
+
+      publishedAt: data['publishedAt'] ? data['publishedAt'].toDate() : null,
+
+      scheduledAt: data['scheduledAt'] ? data['scheduledAt'].toDate() : null,
+
+      status: data['status'] ?? 'published',
+
       views: data['views'] ?? 0,
+
       featured: data['featured'] ?? false,
+
       editorsPick: data['editorsPick'] ?? false,
     } as Article;
   }
@@ -117,6 +181,81 @@ export class ArticleService {
         featured: data['featured'] ?? false,
         editorsPick: data['editorsPick'] ?? false,
       } as Article;
+    });
+  }
+
+  async getArticlesByAuthorId(authorId: string): Promise<Article[]> {
+    const articlesRef = collection(firestore, 'articles');
+
+    const q = query(articlesRef, where('authorId', '==', authorId));
+
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map((document) => {
+      const data = document.data();
+
+      return {
+        id: document.id,
+
+        title: data['title'],
+
+        description: data['description'],
+
+        content: data['content'],
+
+        thumbnail: data['thumbnail'],
+
+        authorId: data['authorId'],
+
+        authorName: data['authorName'],
+
+        createdAt: data['createdAt']?.toDate?.(),
+
+        updatedAt: data['updatedAt']?.toDate?.(),
+
+        publishedAt: data['publishedAt'] ? data['publishedAt'].toDate() : null,
+
+        scheduledAt: data['scheduledAt'] ? data['scheduledAt'].toDate() : null,
+
+        status: data['status'] ?? 'published',
+
+        views: data['views'] ?? 0,
+
+        featured: data['featured'] ?? false,
+
+        editorsPick: data['editorsPick'] ?? false,
+      } as Article;
+    });
+  }
+
+  async updateArticle(
+    articleId: string,
+    article: {
+      title: string;
+      description: string;
+      content: string;
+      thumbnail: string;
+
+      authorId: string;
+      authorName: string;
+
+      status: 'draft' | 'published' | 'scheduled';
+
+      scheduledAt?: Date | null;
+
+      publishedAt?: Date | null;
+
+      views: number;
+      featured: boolean;
+      editorsPick: boolean;
+    },
+  ): Promise<void> {
+    const articleRef = doc(firestore, 'articles', articleId);
+
+    await updateDoc(articleRef, {
+      ...article,
+
+      updatedAt: serverTimestamp(),
     });
   }
 }

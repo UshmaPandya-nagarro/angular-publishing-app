@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 
 import { firestore } from '../firebase/firebase.config';
 import { Author } from '../models/author.model';
@@ -97,5 +97,32 @@ export class AuthorService {
     for (const author of authors) {
       await addDoc(authorsRef, author);
     }
+  }
+
+  async getAuthorByName(authorName: string): Promise<Author | null> {
+    const authorsRef = collection(firestore, 'authors');
+
+    const authorQuery = query(authorsRef, where('name', '==', authorName));
+
+    const snapshot = await getDocs(authorQuery);
+
+    if (snapshot.empty) {
+      return null;
+    }
+
+    const document = snapshot.docs[0];
+
+    const data = document.data();
+
+    return {
+      id: document.id,
+      name: data['name'],
+      email: data['email'],
+      photoURL: data['photoURL'],
+      bio: data['bio'],
+      specialization: data['specialization'] ?? '',
+      followers: data['followers'] ?? 0,
+      articleCount: data['articleCount'] ?? 0,
+    } as Author;
   }
 }

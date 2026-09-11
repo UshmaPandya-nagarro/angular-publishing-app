@@ -1,0 +1,307 @@
+<div class="article-page">
+
+  <main class="article-container">
+
+    <button type="button" class="back-button" (click)="goBack()">
+      ← Back
+    </button>
+
+
+    @if (loading()) {
+
+    <div class="loading-state">
+      Loading article...
+    </div>
+
+    } @else if (errorMessage()) {
+
+    <div class="error-state">
+
+      <h2>Oops!</h2>
+
+      <p>
+        {{ errorMessage() }}
+      </p>
+
+    </div>
+
+    } @else if (article(); as article) {
+
+
+    <!-- ARTICLE HEADER -->
+
+    <header class="article-header">
+
+      <div class="article-tags">
+
+        @if (article.editorsPick) {
+
+        <span class="tag">
+          Editor's Pick
+        </span>
+
+        }
+
+        @if (article.featured) {
+
+        <span class="tag secondary">
+          Featured
+        </span>
+
+        }
+
+      </div>
+
+
+      <h1>
+        {{ article.title }}
+      </h1>
+
+
+      <p class="article-description">
+        {{ article.description }}
+      </p>
+
+
+      <div class="article-author">
+
+        @if (author(); as author) {
+
+        @if (author.photoURL) {
+
+        <img [src]="author.photoURL" [alt]="author.name" class="author-avatar" />
+
+        } @else {
+
+        <div class="avatar-placeholder">
+          {{ article.authorName.charAt(0) }}
+        </div>
+
+        }
+
+        } @else {
+
+        <div class="avatar-placeholder">
+          {{ article.authorName.charAt(0) }}
+        </div>
+
+        }
+
+
+        <div>
+
+          <strong>
+            {{ article.authorName }}
+          </strong>
+
+          <div class="article-meta">
+
+            <span>
+              {{
+              article.publishedAt
+              .toLocaleDateString()
+              }}
+            </span>
+
+            <span>•</span>
+
+            <span>
+              {{ article.views }} views
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- HERO IMAGE -->
+
+    <div class="hero-image-wrapper">
+
+      <img [src]="article.thumbnail" [alt]="article.title" class="hero-image" />
+
+    </div>
+
+
+    <!-- ARTICLE CONTENT -->
+
+    <article class="article-content">
+
+      <p>
+        {{ article.content }}
+      </p>
+
+    </article>
+
+
+    <!-- AUTHOR BIO -->
+
+    @if (author(); as author) {
+
+    <section class="author-box">
+
+      <img [src]="author.photoURL" [alt]="author.name" />
+
+      <div class="author-info">
+
+        <span class="about-label">
+          About the author
+        </span>
+
+        <h3>
+          {{ author.name }}
+        </h3>
+
+        <p>
+          {{ author.bio }}
+        </p>
+
+        <div class="author-extra">
+
+          @if (author.specialization) {
+
+          <span>
+            {{ author.specialization }}
+          </span>
+
+          }
+
+          <span>
+            {{ author.articleCount }}
+            articles
+          </span>
+
+          <span>
+            {{ author.followers }}
+            followers
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    }
+
+
+    <!-- MORE FROM AUTHOR -->
+
+    @if (authorArticles().length > 0) {
+
+    <section class="recommendation-section">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          More from
+        </span>
+
+        <h2>
+          {{ article.authorName }}
+        </h2>
+
+      </div>
+
+
+      <div class="article-grid">
+
+        @for (
+        item of authorArticles().slice(0, 3);
+        track item.id
+        ) {
+
+        <article class="recommendation-card" (click)="openArticle(item.id)">
+
+          <img [src]="item.thumbnail" [alt]="item.title" />
+
+          <div>
+
+            <h3>
+              {{ item.title }}
+            </h3>
+
+            <p>
+              {{ item.description }}
+            </p>
+
+          </div>
+
+        </article>
+
+        }
+
+      </div>
+
+    </section>
+
+    }
+
+    <app-comments [articleId]="article.id!"></app-comments>
+
+
+    <!-- RELATED ARTICLES -->
+
+    @if (relatedArticles().length > 0) {
+
+    <section class="recommendation-section">
+
+      <div class="section-heading">
+
+        <span class="eyebrow">
+          Keep reading
+        </span>
+
+        <h2>
+          Related articles
+        </h2>
+
+      </div>
+
+
+      <div class="article-grid">
+
+        @for (
+        item of relatedArticles();
+        track item.id
+        ) {
+
+        <article class="recommendation-card" (click)="openArticle(item.id)">
+
+          <img [src]="item.thumbnail" [alt]="item.title" />
+
+          <div>
+
+            <span class="card-author">
+              {{ item.authorName }}
+            </span>
+
+            <h3>
+              {{ item.title }}
+            </h3>
+
+            <p>
+              {{ item.description }}
+            </p>
+
+          </div>
+
+        </article>
+
+        }
+
+      </div>
+
+    </section>
+
+    }
+
+    }
+
+  </main>
+
+</div>

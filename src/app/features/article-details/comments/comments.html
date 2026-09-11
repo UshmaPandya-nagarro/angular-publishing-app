@@ -1,0 +1,307 @@
+<section class="comments-section">
+
+  <div class="comments-header">
+
+    <div>
+      <span class="eyebrow">
+        Discussion
+      </span>
+
+      <h2>
+        Comments
+        <span>
+          {{ comments().length }}
+        </span>
+      </h2>
+    </div>
+
+
+    <div class="sort-comments">
+
+      <label for="commentSort">
+        Sort
+      </label>
+
+      <select id="commentSort" #sortSelect (change)="changeSort(sortSelect.value)">
+        <option value="newest">
+          Newest
+        </option>
+
+        <option value="oldest">
+          Oldest
+        </option>
+
+        <option value="liked">
+          Most liked
+        </option>
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <!-- ADD COMMENT -->
+
+  <div class="new-comment">
+
+    @if (
+    authService.currentUser();
+    as user
+    ) {
+
+    @if (
+    user.photoURL &&
+    !avatarLoadFailed()
+    ) {
+
+    <img class="comment-avatar" [src]="user.photoURL" [alt]="user.displayName ?? 'User'" (error)="onAvatarError()" />
+
+    } @else {
+
+    <div class="avatar-placeholder">
+      {{
+      (user.displayName ?? user.email ?? 'U')
+      .charAt(0)
+      .toUpperCase()
+      }}
+    </div>
+
+    }
+
+    }
+
+
+    <div class="comment-input-area">
+
+      <textarea #commentInput rows="3" placeholder="Share your thoughts..." [value]="commentText()" (input)="onCommentInput(
+          commentInput.value
+        )"></textarea>
+
+
+      <div class="comment-actions">
+
+        <span class="comment-hint">
+          Be respectful and constructive.
+        </span>
+
+        <button type="button" class="post-button" [disabled]="
+            !commentText().trim() ||
+            posting()
+          " (click)="postComment()">
+          @if (posting()) {
+          Posting...
+          } @else {
+          Post comment
+          }
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- COMMENT LIST -->
+
+  <div class="comment-list">
+
+    @for (
+    comment of topLevelComments();
+    track comment.id
+    ) {
+
+    <article class="comment">
+
+      <div class="comment-main">
+
+        @if (comment.userPhoto) {
+
+        <img class="comment-avatar" [src]="comment.userPhoto" [alt]="comment.userName" />
+
+        } @else {
+
+        <div class="avatar-placeholder">
+          {{ comment.userName.charAt(0) }}
+        </div>
+
+        }
+
+
+        <div class="comment-content">
+
+          <div class="comment-author-row">
+
+            <strong>
+              {{ comment.userName }}
+            </strong>
+
+            <span>
+              {{
+              comment.createdAt
+              .toLocaleDateString()
+              }}
+            </span>
+
+          </div>
+
+
+          <p>
+            {{ comment.text }}
+          </p>
+
+
+          <div class="comment-controls">
+
+            <button type="button" (click)="likeComment(comment)">
+              ♡
+              {{ comment.likesCount }}
+            </button>
+
+            <button type="button" (click)="startReply(comment)">
+              Reply
+            </button>
+
+          </div>
+
+
+          <!-- REPLY INPUT -->
+
+          @if (
+          replyingTo()?.id ===
+          comment.id
+          ) {
+
+          <div class="reply-box">
+
+            <textarea #replyInput rows="2" placeholder="Write a reply..." [value]="replyText()" (input)="onReplyInput(
+                    replyInput.value
+                  )"></textarea>
+
+
+            <div class="reply-actions">
+
+              <button type="button" class="cancel-button" (click)="cancelReply()">
+                Cancel
+              </button>
+
+              <button type="button" class="reply-button" [disabled]="
+                      !replyText().trim()
+                    " (click)="postReply()">
+                Reply
+              </button>
+
+            </div>
+
+          </div>
+
+          }
+
+
+          <!-- REPLIES -->
+
+          @if (
+          getReplies(comment.id);
+          as replies
+          ) {
+
+          @if (replies.length > 0) {
+
+          <div class="replies">
+
+            @for (
+            reply of replies;
+            track reply.id
+            ) {
+
+            <article class="reply">
+
+              @if (reply.userPhoto) {
+
+              <img class="reply-avatar" [src]="reply.userPhoto" [alt]="reply.userName" />
+
+              } @else {
+
+              <div class="avatar-placeholder small">
+                {{
+                reply.userName
+                .charAt(0)
+                }}
+              </div>
+
+              }
+
+
+              <div>
+
+                <div class="comment-author-row">
+
+                  <strong>
+                    {{ reply.userName }}
+                  </strong>
+
+                  <span>
+                    {{
+                    reply.createdAt
+                    .toLocaleDateString()
+                    }}
+                  </span>
+
+                </div>
+
+
+                <p>
+                  {{ reply.text }}
+                </p>
+
+
+                <button type="button" class="like-reply" (click)="
+                            likeComment(reply)
+                          ">
+                  ♡
+                  {{ reply.likesCount }}
+                </button>
+
+              </div>
+
+            </article>
+
+            }
+
+          </div>
+
+          }
+
+          }
+
+        </div>
+
+      </div>
+
+    </article>
+
+    } @empty {
+
+    <div class="no-comments">
+
+      <div class="empty-icon">
+        💬
+      </div>
+
+      <h3>
+        Start the conversation
+      </h3>
+
+      <p>
+        Be the first person to comment
+        on this article.
+      </p>
+
+    </div>
+
+    }
+
+  </div>
+
+</section>

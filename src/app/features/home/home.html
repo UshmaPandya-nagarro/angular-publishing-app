@@ -144,7 +144,7 @@
 
           </div>
 
-          <button type="button" class="read-button">
+          <button type="button" class="read-button" (click)="openArticle(article.id)">
             Read article
             <span>→</span>
           </button>
@@ -254,7 +254,7 @@
 
               </div>
 
-              <button type="button" class="arrow-button" aria-label="Read article">
+              <button type="button" class="arrow-button" aria-label="Read article" (click)="openArticle(article.id)">
                 →
               </button>
 

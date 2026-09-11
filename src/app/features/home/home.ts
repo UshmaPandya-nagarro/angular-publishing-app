@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { ArticleService } from '../../core/services/article';
 import { Article } from '../../core/models/article.model';
@@ -13,6 +14,7 @@ type SortOption = 'latest' | 'popular' | 'editorsPick';
 })
 export class Home {
   private readonly articleService = inject(ArticleService);
+  private readonly router = inject(Router);
 
   readonly articles = signal<Article[]>([]);
   readonly loading = signal(true);
@@ -80,6 +82,14 @@ export class Home {
 
   constructor() {
     this.loadArticles();
+  }
+
+  openArticle(articleId?: string): void {
+    if (!articleId) {
+      return;
+    }
+
+    this.router.navigate(['/articles', articleId]);
   }
 
   private async loadArticles(): Promise<void> {

@@ -12,6 +12,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/authors/authors').then((m) => m.Authors),
   },
   {
+    path: 'articles/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/article-details/article-details').then((m) => m.ArticleDetails),
+  },
+  {
     path: 'home',
     canActivate: [authGuard],
     loadComponent: () => import('./features/home/home').then((m) => m.Home),

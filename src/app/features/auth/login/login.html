@@ -1,0 +1,23 @@
+<div class="login-page">
+  <div class="login-card">
+    <h1>Welcome</h1>
+
+    <p>
+      Sign in to publish articles, comment and interact with other writers.
+    </p>
+
+    <button type="button" class="google-button" [disabled]="loading" (click)="loginWithGoogle()">
+      @if (loading) {
+      Signing in...
+      } @else {
+      Continue with Google
+      }
+    </button>
+
+    @if (errorMessage) {
+    <p class="error-message">
+      {{ errorMessage }}
+    </p>
+    }
+  </div>
+</div>

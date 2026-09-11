@@ -1,0 +1,329 @@
+<div class="page-shell">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+
+      <div class="brand">
+        <div class="brand-mark">P</div>
+
+        <div>
+          <div class="brand-name">PublishHub</div>
+          <div class="brand-tagline">Ideas worth sharing</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+
+        <div class="search-box">
+          <span class="search-icon">⌕</span>
+
+          <input #searchInput type="search" placeholder="Search articles or authors..."
+            (input)="onSearch(searchInput.value)" />
+        </div>
+
+        <button type="button" class="write-button">
+          <span>✎</span>
+          Write article
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+
+  <main class="page-content">
+
+    <!-- PAGE INTRO -->
+    <section class="intro-section">
+      <div>
+        <p class="eyebrow">Discover</p>
+
+        <h1>
+          Stories, ideas and perspectives
+          <span>worth reading.</span>
+        </h1>
+
+        <p class="intro-description">
+          Explore insightful articles from writers,
+          creators and thinkers across different topics.
+        </p>
+      </div>
+    </section>
+
+
+    @if (loading()) {
+
+    <!-- SKELETON -->
+    <section class="skeleton-featured">
+      <div class="skeleton image-skeleton"></div>
+
+      <div class="skeleton-content">
+        <div class="skeleton small-line"></div>
+        <div class="skeleton heading-line"></div>
+        <div class="skeleton heading-line short"></div>
+        <div class="skeleton text-line"></div>
+        <div class="skeleton text-line"></div>
+      </div>
+    </section>
+
+    } @else if (errorMessage()) {
+
+    <div class="error-state">
+      <div class="error-icon">!</div>
+
+      <h3>Something went wrong</h3>
+
+      <p>{{ errorMessage() }}</p>
+    </div>
+
+    } @else {
+
+    <!-- FEATURED ARTICLE -->
+    @if (featuredArticle(); as article) {
+
+    <section class="featured-section">
+
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Featured story</p>
+          <h2>Editor's choice</h2>
+        </div>
+      </div>
+
+      <article class="featured-card">
+
+        <div class="featured-image-wrapper">
+
+          <img class="featured-image" [src]="article.thumbnail" [alt]="article.title" />
+
+          <span class="featured-badge">
+            ★ Editor's Pick
+          </span>
+
+        </div>
+
+        <div class="featured-content">
+
+          <div class="category-label">
+            Featured
+          </div>
+
+          <h2>
+            {{ article.title }}
+          </h2>
+
+          <p class="featured-description">
+            {{ article.description }}
+          </p>
+
+          <div class="author-row">
+
+            <div class="author-avatar">
+              {{ article.authorName.charAt(0) }}
+            </div>
+
+            <div class="author-details">
+              <strong>
+                {{ article.authorName }}
+              </strong>
+
+              <div class="meta-row">
+                <span>
+                  {{ article.publishedAt?.toLocaleDateString() }}
+                </span>
+
+                <span class="dot">•</span>
+
+                <span>
+                  {{ article.views }} views
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <button type="button" class="read-button">
+            Read article
+            <span>→</span>
+          </button>
+
+        </div>
+
+      </article>
+
+    </section>
+
+    }
+
+
+    <!-- ARTICLE FEED -->
+    <section class="article-feed">
+
+      <div class="feed-header">
+
+        <div>
+          <p class="eyebrow">Explore</p>
+          <h2>Latest articles</h2>
+        </div>
+
+        <div class="sort-wrapper">
+          <span>Sort by</span>
+
+          <select #sortSelect (change)="onSortChange(sortSelect.value)">
+            <option value="latest">
+              Latest
+            </option>
+
+            <option value="popular">
+              Most Popular
+            </option>
+
+            <option value="editorsPick">
+              Editor's Pick
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <div class="article-list">
+
+        @for (
+        article of paginatedArticles();
+        track article.id
+        ) {
+
+        <article class="article-card">
+
+          <div class="article-content">
+
+            <div class="article-labels">
+
+              @if (article.editorsPick) {
+              <span class="badge editor-badge">
+                Editor's Pick
+              </span>
+              }
+
+              @if (article.views > 1000000) {
+              <span class="badge trending-badge">
+                Trending
+              </span>
+              }
+
+            </div>
+
+            <h3>
+              {{ article.title }}
+            </h3>
+
+            <p class="article-description">
+              {{ article.description }}
+            </p>
+
+            <div class="card-footer">
+
+              <div class="author-row">
+
+                <div class="author-avatar small">
+                  {{ article.authorName }}
+                </div>
+
+                <div class="author-details">
+
+                  <strong>
+                    {{ article.authorName }}
+                  </strong>
+
+                  <div class="meta-row">
+                    <span>
+                      {{ article.publishedAt?.toLocaleDateString() }}
+                    </span>
+
+                    <span class="dot">•</span>
+
+                    <span>
+                      {{ article.views }} views
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <button type="button" class="arrow-button" aria-label="Read article">
+                →
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="thumbnail-wrapper">
+
+            <img class="article-thumbnail" [src]="article.thumbnail" [alt]="article.title" />
+
+          </div>
+
+        </article>
+
+        } @empty {
+
+        <div class="empty-state">
+
+          <div class="empty-icon">⌕</div>
+
+          <h3>No articles found</h3>
+
+          <p>
+            Try searching with a different
+            keyword or author name.
+          </p>
+
+        </div>
+
+        }
+
+      </div>
+
+
+      <!-- PAGINATION -->
+      @if (paginatedArticles().length > 0) {
+
+      <div class="pagination">
+
+        <button type="button" class="page-button" [disabled]="currentPage() === 1" (click)="previousPage()">
+          ← Previous
+        </button>
+
+        <div class="page-status">
+          <span>Page</span>
+
+          <strong>
+            {{ currentPage() }}
+          </strong>
+
+          <span>
+            of {{ totalPages() }}
+          </span>
+        </div>
+
+        <button type="button" class="page-button" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+          Next →
+        </button>
+
+      </div>
+
+      }
+
+    </section>
+
+    }
+
+  </main>
+
+</div>

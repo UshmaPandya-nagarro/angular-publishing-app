@@ -1,0 +1,199 @@
+<div class="authors-page">
+
+  <section class="authors-hero">
+
+    <span class="eyebrow">
+      Discover people
+    </span>
+
+    <h1>
+      Meet our writers
+    </h1>
+
+    <p>
+      Discover talented writers, explore their
+      perspectives and find your next favourite author.
+    </p>
+
+
+    <div class="author-search">
+
+      <span class="search-icon">
+        ⌕
+      </span>
+
+      <input #searchInput type="search" placeholder="Search authors by name..." (input)="onSearch(searchInput.value)" />
+
+    </div>
+
+  </section>
+
+
+  <main class="authors-content">
+
+    <div class="section-header">
+
+      <div>
+        <span class="eyebrow">
+          Community
+        </span>
+
+        <h2>
+          Explore authors
+        </h2>
+      </div>
+
+      @if (!loading()) {
+      <span class="author-count">
+        {{ filteredAuthors().length }}
+        authors
+      </span>
+      }
+
+    </div>
+
+
+    @if (loading()) {
+
+    <div class="authors-grid">
+
+      @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+
+      <div class="author-card skeleton-card">
+
+        <div class="skeleton avatar-skeleton"></div>
+
+        <div class="skeleton title-skeleton"></div>
+
+        <div class="skeleton text-skeleton"></div>
+
+        <div class="skeleton text-skeleton short"></div>
+
+      </div>
+
+      }
+
+    </div>
+
+    } @else if (errorMessage()) {
+
+    <div class="state-message">
+
+      <h3>
+        Something went wrong
+      </h3>
+
+      <p>
+        {{ errorMessage() }}
+      </p>
+
+    </div>
+
+    } @else {
+
+    <div class="authors-grid">
+
+      @for (
+      author of filteredAuthors();
+      track author.id
+      ) {
+
+      <article class="author-card">
+
+        <div class="author-top">
+
+          <div class="avatar-wrapper">
+
+            @if (author.photoURL) {
+
+            <img [src]="author.photoURL" [alt]="author.name" />
+
+            } @else {
+
+            <div class="avatar-placeholder">
+              {{ author.name.charAt(0) }}
+            </div>
+
+            }
+
+          </div>
+
+
+          @if (author.specialization) {
+
+          <span class="specialization">
+            {{ author.specialization }}
+          </span>
+
+          }
+
+        </div>
+
+
+        <h3>
+          {{ author.name }}
+        </h3>
+
+        <p class="author-bio">
+          {{ author.bio }}
+        </p>
+
+
+        <div class="author-stats">
+
+          <div>
+            <strong>
+              {{ author.articleCount }}
+            </strong>
+
+            <span>Articles</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div>
+            <strong>
+              {{ author.followers }}
+            </strong>
+
+            <span>Followers</span>
+          </div>
+
+        </div>
+
+
+        <button type="button" class="profile-button">
+          View profile
+          <span>→</span>
+        </button>
+
+      </article>
+
+      } @empty {
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+          ⌕
+        </div>
+
+        <h3>
+          No authors found
+        </h3>
+
+        <p>
+          We couldn't find an author matching
+          "{{ searchTerm() }}".
+        </p>
+
+      </div>
+
+      }
+
+    </div>
+
+    }
+
+  </main>
+
+</div>

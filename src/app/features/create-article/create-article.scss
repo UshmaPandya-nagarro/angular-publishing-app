@@ -480,6 +480,89 @@ $danger: #d92d20;
   }
 }
 
+.article-stats {
+  display: flex;
+  gap: 18px;
+  margin: 10px;
+  font-size: 13px;
+  color: #7a7b84;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+:host ::ng-deep {
+  // Whole Quill editor
+  quill-editor {
+    display: block;
+    width: 100%;
+  }
+
+  // Toolbar - background should continue
+  // across the COMPLETE horizontal row
+  .ql-toolbar.ql-snow {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 14px 18px;
+
+    background: #f8f8fc;
+
+    border: 1px solid #e7e8ee;
+    border-bottom: 1px solid #e7e8ee;
+
+    border-radius: 14px 14px 0 0;
+  }
+
+  // Editor container
+  .ql-container.ql-snow {
+    width: 100%;
+    box-sizing: border-box;
+
+    border: 1px solid #e7e8ee;
+    border-top: 0;
+
+    border-radius: 0 0 14px 14px;
+
+    background: #ffffff;
+
+    // Initial editor height
+    min-height: 350px;
+
+    // Maximum allowed height
+    max-height: 550px;
+
+    // Scroll after max height
+    overflow-y: auto;
+  }
+
+  // Actual writing area
+  .ql-editor {
+    min-height: 350px;
+
+    padding: 32px 50px;
+
+    font-size: 18px;
+    line-height: 1.8;
+
+    color: #35363c;
+
+    overflow-wrap: anywhere;
+  }
+
+  // Placeholder
+  .ql-editor.ql-blank::before {
+    left: 50px;
+
+    color: #a7a8b1;
+
+    font-size: 18px;
+    font-style: normal;
+  }
+}
+
 /* OPTIONAL VALIDATION STYLING */
 
 .title-input.ng-invalid.ng-touched {

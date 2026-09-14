@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -16,7 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './create-article.html',
   styleUrl: './create-article.scss',
 })
-export class CreateArticle {
+export class CreateArticle implements OnDestroy {
   private readonly fb = inject(FormBuilder);
 
   private readonly articleService = inject(ArticleService);
@@ -36,6 +36,14 @@ export class CreateArticle {
   readonly publishing = signal(false);
 
   readonly message = signal('');
+
+  readonly wordCount = signal(0);
+
+  readonly characterCount = signal(0);
+
+  readonly readingTime = signal(0);
+
+  private worker?: Worker;
 
   readonly articleForm = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(150)]],
@@ -78,6 +86,22 @@ export class CreateArticle {
 
   constructor() {
     this.loadArticleIfEditing();
+
+    if (typeof Worker !== 'undefined') {
+      this.worker = new Worker(new URL('./article-analysis.worker', import.meta.url));
+
+      this.worker.onmessage = ({ data }) => {
+        this.wordCount.set(data.wordCount);
+
+        this.characterCount.set(data.characterCount);
+
+        this.readingTime.set(data.readingTime);
+      };
+
+      this.articleForm.controls.content.valueChanges.subscribe((content) => {
+        this.worker?.postMessage(content);
+      });
+    }
   }
 
   private async loadArticleIfEditing(): Promise<void> {
@@ -274,5 +298,9 @@ export class CreateArticle {
     } finally {
       this.publishing.set(false);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.worker?.terminate();
   }
 }

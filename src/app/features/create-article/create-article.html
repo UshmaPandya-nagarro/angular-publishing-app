@@ -60,6 +60,24 @@
       <quill-editor formControlName="content" [modules]="editorModules" placeholder="Tell your story...">
       </quill-editor>
 
+      <div class="article-stats">
+
+        <span>
+          {{ wordCount() }}
+          words
+        </span>
+
+        <span>
+          {{ characterCount() }}
+          characters
+        </span>
+
+        <span>
+          {{ readingTime() }}
+          min read
+        </span>
+
+      </div>
     </div>
 
 

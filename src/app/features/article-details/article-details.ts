@@ -39,17 +39,20 @@ export class ArticleDetails {
   readonly errorMessage = signal('');
 
   constructor() {
-    const articleId = this.route.snapshot.paramMap.get('id');
+    this.route.paramMap.subscribe((params) => {
+      const articleId = params.get('id');
 
-    if (!articleId) {
-      this.errorMessage.set('Article not found.');
+      if (!articleId) {
+        this.errorMessage.set('Article not found.');
 
-      this.loading.set(false);
+        this.loading.set(false);
 
-      return;
-    }
-
-    this.loadArticle(articleId);
+        return;
+      }
+      if (articleId) {
+        this.loadArticle(articleId);
+      }
+    });
   }
 
   private async loadArticle(articleId: string): Promise<void> {
@@ -105,8 +108,6 @@ export class ArticleDetails {
         top: 0,
         behavior: 'smooth',
       });
-
-      window.location.reload();
     });
   }
 }
